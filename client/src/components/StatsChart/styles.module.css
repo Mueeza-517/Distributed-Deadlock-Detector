@@ -1,0 +1,84 @@
+.card {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.header {
+  margin-bottom: 20px;
+}
+
+.header h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #222;
+}
+
+.chartContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.pie {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.innerCircle {
+  width: 110px;
+  height: 110px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+}
+
+.innerCircle span {
+  font-size: 24px;
+  font-weight: 700;
+  color: #6c63ff;
+}
+
+.labels {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  flex: 1;
+}
+
+.labelItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.color {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+}
+
+.labelItem p {
+  flex: 1;
+  margin: 0;
+  color: #555;
+  font-size: 14px;
+}
+
+.labelItem strong {
+  font-size: 15px;
+  color: #111;
+}

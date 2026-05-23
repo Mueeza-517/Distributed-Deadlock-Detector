@@ -1,0 +1,75 @@
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  margin-bottom: 8px;
+  background: var(--bg-light);
+  transition: box-shadow 0.15s;
+}
+
+.card:hover {
+  box-shadow: 0 2px 12px rgba(108,99,255,0.1);
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.indexBadge {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: #3e39a3;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.txId {
+  font-size: 12px;
+  color: var(--text-dark);
+}
+
+.txId strong {
+  color: var(--text-dark);
+}
+
+.timestamp {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.statusBadge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 12px;
+  border-radius: 20px;
+}
+
+.statusRed {
+  background: #fff0f0;
+  color: #cc3333;
+  border: 1px solid #ffcaca;
+}
+
+.statusOrange {
+  background: #fff8ee;
+  color: #cc7700;
+  border: 1px solid #ffdda0;
+}
+
+.statusGreen {
+  background: #f0fff8;
+  color: #226644;
+  border: 1px solid #b0ecd0;
+}
