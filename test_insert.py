@@ -1,9 +1,11 @@
-# test_insert.py
+import sys
+sys.path.append('backend')
 
-from database import get_postgres_conn, get_mongo_db
+from app.database.postgres_client import get_postgres_conn
+from app.database.mongo_client import get_mongo_db
 from datetime import datetime
 
-# PostgreSQL mein sample data
+# PostgreSQL
 conn = get_postgres_conn()
 cur = conn.cursor()
 
@@ -17,16 +19,16 @@ cur.execute("""
     INSERT INTO lock_history (tx_id, resource_name, lock_type, is_waiting)
     VALUES (1, 'Table_Orders', 'exclusive', false),
            (2, 'Table_Users', 'exclusive', false),
-           (1, 'Table_Users', 'exclusive', true),   -- Tx1 is waiting
-           (2, 'Table_Orders', 'exclusive', true)   -- Tx2 is waiting = DEADLOCK!
+           (1, 'Table_Users', 'exclusive', true),
+           (2, 'Table_Orders', 'exclusive', true)
 """)
 
 conn.commit()
 cur.close()
 conn.close()
-print("✅ PostgreSQL test data inserted!")
+print("✅ PostgreSQL data inserted!")
 
-# MongoDB mein sample log
+# MongoDB
 db = get_mongo_db()
 db.raw_logs.insert_many([
     {
@@ -38,10 +40,10 @@ db.raw_logs.insert_many([
     },
     {
         "timestamp": datetime.now(),
-        "node_id": "node-2", 
+        "node_id": "node-2",
         "log_level": "ERROR",
         "message": "Potential deadlock detected between Tx_Alpha and Tx_Beta",
         "tx_ids": [1, 2]
     }
 ])
-print("✅ MongoDB test data inserted!")
+print("✅ MongoDB data inserted!")
