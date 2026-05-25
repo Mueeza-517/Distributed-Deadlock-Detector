@@ -1,0 +1,184 @@
+.container {
+  flex: 1;
+  padding: 32px;
+  overflow-y: auto;
+  background: #f8f9ff;
+}
+
+/* Title Section */
+.titleSection {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #e8eaff;
+}
+
+.titleSection i {
+  font-size: 28px;
+  color: #2b225f;
+}
+
+.titleSection h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1f3a;
+  margin: 0;
+}
+
+/* Cards */
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  border: 1px solid #e8eaff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e8eaff;
+}
+
+.cardHeader i {
+  font-size: 20px;
+  color: #2b225f;
+}
+
+.cardHeader h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1f3a;
+  margin: 0;
+}
+
+/* Why Grid */
+.whyGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.whyItem {
+  text-align: center;
+  padding: 16px;
+}
+
+.whyItem i {
+  font-size: 32px;
+  color: #2b225f;
+  margin-bottom: 12px;
+}
+
+.whyItem h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1f3a;
+  margin-bottom: 8px;
+}
+
+.whyItem p {
+  font-size: 13px;
+  color: #4a5075;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Tech Grid */
+.techGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.techItem {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+  background: #f8f9ff;
+  border-radius: 12px;
+}
+
+.techItem i {
+  font-size: 28px;
+  color: #2b225f;
+}
+
+.techItem h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1f3a;
+  margin: 0 0 4px 0;
+}
+
+.techItem p {
+  font-size: 12px;
+  color: #8a8fba;
+  margin: 0;
+}
+
+/* Steps */
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px;
+  background: #f8f9ff;
+  border-radius: 12px;
+}
+
+.stepNum {
+  width: 32px;
+  height: 32px;
+  background: #2b225f;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.step h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1f3a;
+  margin: 0 0 6px 0;
+}
+
+.step p {
+  font-size: 12px;
+  color: #4a5075;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+  
+  .whyGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .techGrid {
+    grid-template-columns: 1fr;
+  }
+}

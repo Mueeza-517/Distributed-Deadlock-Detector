@@ -28,7 +28,7 @@ const parseSections = (text) => {
 };
 
 const DeadlockCard = ({ deadlock, index }) => {
-  const [popup, setPopup]   = useState(null);
+  const [popup, setPopup] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const status = statusConfig[deadlock.status] || statusConfig.detected;
@@ -57,7 +57,7 @@ const DeadlockCard = ({ deadlock, index }) => {
 
   return (
     <>
-      {/* ── Card ── */}
+      {/* Card */}
       <div
         className={styles.card}
         onClick={handleClick}
@@ -73,60 +73,78 @@ const DeadlockCard = ({ deadlock, index }) => {
               </strong>
             </p>
             <p className={styles.timestamp}>
-              🕐 {formatTime(deadlock.timestamp)}
+              <i className="far fa-clock"></i> {formatTime(deadlock.timestamp)}
             </p>
           </div>
         </div>
         <div className={styles.right}>
           <span className={`${styles.statusBadge} ${status.color}`}>
-            {loading ? '⏳ Loading...' : status.label}
+            {loading ? <i className="fas fa-spinner fa-pulse"></i> : status.label}
           </span>
         </div>
       </div>
 
-      {/* ── Popup ── */}
+      {/* Popup - Help Popup Style */}
       {popup && (
         <div className={styles.overlay} onClick={() => setPopup(null)}>
-          <div
-            className={styles.popupBox}
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
+            
             {/* Header */}
             <div className={styles.popupHeader}>
-              <span>🤖 AI Deadlock Analysis — Event #{deadlock.id}</span>
-              <button
-                className={styles.closeBtn}
-                onClick={() => setPopup(null)}
-              >✕</button>
+              <div className={styles.headerIcon}>
+                <i className="fas fa-robot"></i>
+              </div>
+              <h2 className={styles.popupTitle}>AI Deadlock Analysis</h2>
+              <button className={styles.closeBtn} onClick={() => setPopup(null)}>
+                <i className="fas fa-times"></i>
+              </button>
             </div>
 
-            {/* Sections */}
-            {[
-              { key: 'SITUATION',        icon: '📋', cls: styles.blue   },
-              { key: 'ROOT CAUSE',       icon: '🔍', cls: styles.amber  },
-              { key: 'VICTIM SELECTION', icon: '⚖️', cls: styles.red    },
-              { key: 'RESOLUTION',       icon: '✅', cls: styles.green  },
-              { key: 'PREVENTION',       icon: '🛡️', cls: styles.purple },
-            ].map(({ key, icon, cls }) =>
-              sections[key] ? (
-                <div key={key} className={`${styles.section} ${cls}`}>
-                  <div className={styles.sectionTitle}>
-                    {icon} {key}
-                  </div>
-                  <div className={styles.sectionBody}>
-                    {sections[key]}
-                  </div>
-                </div>
-              ) : null
-            )}
-
-            {/* Suggested Fix */}
-            {popup.suggested_fix && (
-              <div className={styles.fixBox}>
-                <div className={styles.fixTitle}>⚠️ Suggested Fix</div>
-                <div className={styles.fixBody}>{popup.suggested_fix}</div>
+            {/* Content */}
+            <div className={styles.popupContent}>
+              {/* Event ID */}
+              <div className={styles.eventId}>
+                <i className="fas fa-hashtag"></i>
+                <span>Event #{deadlock.id}</span>
               </div>
-            )}
+
+              {/* Sections */}
+              {[
+                { key: 'SITUATION', icon: <i className="fas fa-info-circle"></i>, cls: styles.blue },
+                { key: 'ROOT CAUSE', icon: <i className="fas fa-search"></i>, cls: styles.amber },
+                { key: 'VICTIM SELECTION', icon: <i className="fas fa-crosshairs"></i>, cls: styles.red },
+                { key: 'RESOLUTION', icon: <i className="fas fa-check-circle"></i>, cls: styles.green },
+                { key: 'PREVENTION', icon: <i className="fas fa-shield-alt"></i>, cls: styles.purple },
+              ].map(({ key, icon, cls }) =>
+                sections[key] ? (
+                  <div key={key} className={`${styles.section} ${cls}`}>
+                    <div className={styles.sectionTitle}>
+                      {icon} {key}
+                    </div>
+                    <div className={styles.sectionBody}>
+                      {sections[key]}
+                    </div>
+                  </div>
+                ) : null
+              )}
+
+              {/* Suggested Fix */}
+              {popup.suggested_fix && (
+                <div className={styles.fixBox}>
+                  <div className={styles.fixTitle}>
+                    <i className="fas fa-exclamation-triangle"></i> Suggested Fix
+                  </div>
+                  <div className={styles.fixBody}>{popup.suggested_fix}</div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className={styles.popupFooter}>
+              <button className={styles.footerCloseBtn} onClick={() => setPopup(null)}>
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}
