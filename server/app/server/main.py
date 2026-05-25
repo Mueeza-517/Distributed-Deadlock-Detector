@@ -1,12 +1,11 @@
 import sys
-sys.path.append('backend')
+sys.path.append('server')
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from datetime import datetime
 import random
 import string
-from datetime import datetime
 
 from app.services.postgres_service import (
     insert_transaction,
@@ -15,16 +14,7 @@ from app.services.postgres_service import (
     get_recent_deadlocks,
     get_all_transactions,
     get_waiting_locks,
-    get_node_info          # ← yeh add karo
-)
-
-from app.services.postgres_service import (
-    insert_transaction,
-    insert_lock,
-    save_deadlock_event,
-    get_recent_deadlocks,
-    get_all_transactions,
-    get_waiting_locks
+    get_node_info
 )
 from app.services.mongo_service import (
     save_raw_log,
@@ -33,7 +23,7 @@ from app.services.mongo_service import (
     get_error_logs,
     get_explanation_by_event
 )
-from app.llm_client import explain_deadlock
+from app.llm_client import explain_deadlock, get_prevention_tip
 
 app = FastAPI(
     title="Distributed Deadlock Detector API",
@@ -49,7 +39,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
+# ─────────────────────────────────────────
+# 1. HEALTH CHECK
+# ─────────────────────────────────────────
 @app.get("/health")
 def health_check():
     return {
@@ -59,16 +51,16 @@ def health_check():
         "version": "1.0.0"
     }
 
+# ─────────────────────────────────────────
+# 2. GET ALL DEADLOCKS
+# ─────────────────────────────────────────
 @app.get("/api/v1/deadlocks")
 def get_deadlocks():
     try:
         events = get_recent_deadlocks(limit=20)
+        node_info = get_node_info("node-1")
         deadlocks = []
         for event in events:
-            # Real node info fetch karo
-            node_id = "node-1"
-            node_info = get_node_info(node_id)
-            
             deadlocks.append({
                 "id": event["event_id"],
                 "timestamp": event["detected_at"],
@@ -77,13 +69,15 @@ def get_deadlocks():
                 "resolution_time_ms": event["resolution_time_ms"],
                 "status": "resolved",
                 "node": node_info["node_id"],
-                "server_location": node_info["location"]  # ← DB se aa raha hai
+                "server_location": node_info["location"]
             })
         return {"deadlocks": deadlocks}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
+# ─────────────────────────────────────────
+# 3. SIMULATE DEADLOCK
+# ─────────────────────────────────────────
 @app.post("/api/v1/deadlocks/simulate")
 def simulate_deadlock():
     try:
@@ -128,6 +122,9 @@ def simulate_deadlock():
         }
         llm_response = explain_deadlock(deadlock_info)
 
+        # Prevention tip lo
+        prevention_tip = get_prevention_tip(res1, res2)
+
         # Deadlock event save karo
         event_id = save_deadlock_event(
             tx_ids=[tx1_id, tx2_id],
@@ -146,26 +143,31 @@ def simulate_deadlock():
             suggested_fix=f"Kill {tx2_name} to break the cycle."
         )
 
+        # Node info fetch karo
         node_info = get_node_info("node-1")
+
         return {
             "success": True,
             "deadlock": {
                 "id": event_id,
                 "timestamp": str(datetime.now()),
                 "transactions": [tx1_name, tx2_name],
+                "resources_involved": [res1, res2],
                 "llm_explanation": llm_response,
+                "prevention_tip": prevention_tip,
                 "suggested_fix": f"Kill {tx2_name} to break the cycle.",
                 "status": "resolved",
                 "node": node_info["node_id"],
                 "server_location": node_info["location"]
             }
         }
-        
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
+# ─────────────────────────────────────────
+# 4. GET LOGS
+# ─────────────────────────────────────────
 @app.get("/api/v1/logs")
 def get_logs():
     try:
@@ -174,7 +176,9 @@ def get_logs():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
+# ─────────────────────────────────────────
+# 5. GET ALL TRANSACTIONS
+# ─────────────────────────────────────────
 @app.get("/api/v1/transactions")
 def get_transactions():
     try:
@@ -183,7 +187,9 @@ def get_transactions():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
+# ─────────────────────────────────────────
+# 6. GET WAITING LOCKS
+# ─────────────────────────────────────────
 @app.get("/api/v1/locks/waiting")
 def get_waiting():
     try:
@@ -191,12 +197,65 @@ def get_waiting():
         return {"waiting_locks": locks}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
+
+# ─────────────────────────────────────────
+# 7. GET NODES
+# ─────────────────────────────────────────
 @app.get("/api/v1/nodes")
 def get_nodes():
     try:
         node_ids = ["node-1", "node-2", "node-3"]
         nodes = [get_node_info(n) for n in node_ids]
         return {"nodes": nodes}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ─────────────────────────────────────────
+# 8. STATS
+# ─────────────────────────────────────────
+@app.get("/api/v1/stats")
+def get_stats():
+    try:
+        events = get_recent_deadlocks(limit=100)
+        total = len(events)
+
+        avg_ms = 0
+        if total > 0:
+            avg_ms = sum(
+                e["resolution_time_ms"]
+                for e in events
+                if e["resolution_time_ms"]
+            ) / total
+
+        waiting = get_waiting_locks()
+        top_resource = "N/A"
+        if waiting:
+            top_resource = waiting[0]["resource_name"]
+
+        return {
+            "total_deadlocks": total,
+            "avg_resolution_ms": round(avg_ms, 2),
+            "most_affected_resource": top_resource,
+            "resolved_percentage": 100,
+            "active_nodes": 3
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ─────────────────────────────────────────
+# 9. GET LLM EXPLANATION BY EVENT ID
+# ─────────────────────────────────────────
+@app.get("/api/v1/explanation/{event_id}")
+def get_explanation(event_id: int):
+    try:
+        explanation = get_explanation_by_event(event_id)
+        if not explanation:
+            raise HTTPException(
+                status_code=404,
+                detail=f"No explanation found for event {event_id}"
+            )
+        return explanation
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
