@@ -38,6 +38,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+from app.services.neo4j_service import (
+    create_transaction_node,
+    create_waits_for_edge,
+    detect_deadlock_cycle,
+    get_wait_for_graph,
+    clear_resolved_transaction
+)
 
 # ─────────────────────────────────────────
 # 1. HEALTH CHECK
@@ -131,6 +138,17 @@ def simulate_deadlock():
             resolved_by=f"killed_{tx2_name}",
             resolution_time_ms=random.randint(100, 500)
         )
+        # Neo4j mein graph update karo
+        create_transaction_node(tx1_id, tx1_name, "node-1")
+        create_transaction_node(tx2_id, tx2_name, "node-2")
+        create_waits_for_edge(tx1_id, tx2_id, res2)
+        create_waits_for_edge(tx2_id, tx1_id, res1)
+
+        # Cycle detect karo
+        cycles = detect_deadlock_cycle()
+
+        # Resolved transaction clean karo
+        clear_resolved_transaction(tx2_id)
 
         # LLM explanation MongoDB mein save karo
         save_llm_explanation(
@@ -158,10 +176,38 @@ def simulate_deadlock():
                 "suggested_fix": f"Kill {tx2_name} to break the cycle.",
                 "status": "resolved",
                 "node": node_info["node_id"],
-                "server_location": node_info["location"]
+                "server_location": node_info["location"],
+                "graph_cycle_detected": len(cycles) > 0,
             }
         }
 
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+    # ─────────────────────────────────────────
+# 10. WAIT-FOR GRAPH (Neo4j)
+# ─────────────────────────────────────────
+@app.get("/api/v1/graph")
+def get_graph():
+    try:
+        graph = get_wait_for_graph()
+        return graph
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ─────────────────────────────────────────
+# 11. DETECT CYCLE (Neo4j)
+# ─────────────────────────────────────────
+@app.get("/api/v1/detect")
+def detect_cycle():
+    try:
+        cycles = detect_deadlock_cycle()
+        return {
+            "cycles_found": len(cycles),
+            "deadlock_detected": len(cycles) > 0,
+            "cycles": cycles
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
