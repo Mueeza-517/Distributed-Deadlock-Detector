@@ -1,0 +1,235 @@
+.container {
+  flex: 1;
+  padding: 32px;
+  overflow-y: auto;
+  background: #f8f9ff;
+}
+
+.titleSection {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #e8eaff;
+}
+
+.titleSection i {
+  font-size: 28px;
+  color: #2b225f;
+}
+
+.titleSection h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1f3a;
+  margin: 0;
+}
+
+.refreshBtn {
+  background: #ffffff;
+  color: #2b225f;
+  border: 1.5px solid #2b225f;
+  border-radius: 8px;
+  padding: 7px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.refreshBtn:hover {
+  background: #2b225f;
+  color: white;
+}
+
+.refreshBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.refreshBtn i {
+    font-size: 12px;;
+}
+
+.refreshBtn:hover i {
+  color: white;
+}
+
+.infoCard {
+  background: white;
+  border-radius: 16px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  border: 1px solid #e8eaff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.infoCard p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #4a5075;
+  margin: 0;
+}
+
+.graphContainer {
+  background: white;
+  border-radius: 20px;
+  border: 1px solid #e8eaff;
+  min-height: 500px;
+  position: relative;
+  margin-bottom: 0;
+  overflow: auto;
+}
+
+.graphVisual {
+  position: relative;
+  min-height: 500px;
+  display: flex;
+  justify-content: center;
+}
+
+.graphSvg {
+  width: 100%;
+  height: auto;
+  min-height: 450px;
+  background: white;
+  border-radius: 20px;
+}
+
+.loadingWrap, .errorWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  gap: 12px;
+  color: #8a8fba;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #e8eaff;
+  border-top-color: #2b225f;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.legend {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: white;
+  border-radius: 12px;
+  padding: 12px 16px;
+  border: 1px solid #e8eaff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.legendTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1a1f3a;
+  margin-bottom: 8px;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: #4a5075;
+  margin-bottom: 4px;
+}
+
+.legendColor {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+}
+
+.legendColorRed {
+  width: 20px;
+  height: 4px;
+  background: #ef4444;
+  border-radius: 2px;
+}
+
+.nodeInfo {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: white;
+  border-radius: 12px;
+  padding: 12px 16px;
+  border: 1px solid #e8eaff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  min-width: 160px;
+}
+
+.nodeInfoHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e8eaff;
+}
+
+.nodeInfoHeader h4 {
+  margin: 0;
+  font-size: 12px;
+  color: #1a1f3a;
+}
+
+.nodeInfoHeader button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #8a8fba;
+  font-size: 14px;
+}
+
+.nodeInfoContent p {
+  margin: 6px 0;
+  font-size: 12px;
+  color: #4a5075;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+  
+  .titleSection h1 {
+    font-size: 18px;
+  }
+  
+  .infoCard {
+    padding: 16px;
+  }
+  
+  .infoCard p {
+    font-size: 13px;
+  }
+  
+  .graphSvg {
+    min-height: 350px;
+  }
+  
+  .legend {
+    bottom: 10px;
+    right: 10px;
+    padding: 8px 12px;
+  }
+}

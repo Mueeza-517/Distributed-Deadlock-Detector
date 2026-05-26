@@ -3,7 +3,8 @@ import './App.css';
 import Navbar from './components/Navbar';
 import Dashboard from './components/Dashboard';
 import DocumentationPage from './components/DocumentationPage';
-import AnalyticsPage from './components/AnalyticsPage';  // ← Add this import
+import AnalyticsPage from './components/AnalyticsPage';
+import Neo4jGraphPage from './components/Neo4jGraphPage';  // ← Add this import
 import { useDeadlocks } from './hooks/useDeadlocks';
 
 function App() {
@@ -11,6 +12,10 @@ function App() {
   const { deadlocks, loading, error, refresh, simulate } = useDeadlocks();
 
   const renderPage = () => {
+    // Graph Page (Neo4j)
+    if (currentPage === 'graph') {
+      return <Neo4jGraphPage />;
+    }
     // Analytics Page 
     if (currentPage === 'analytics') {
       return <AnalyticsPage deadlocks={deadlocks} />;

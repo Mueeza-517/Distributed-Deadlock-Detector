@@ -5,13 +5,11 @@ const DocumentationPage = () => {
   return (
     <div className={styles.container}>
       
-      {/* Title */}
       <div className={styles.titleSection}>
         <i className="fas fa-file-alt"></i>
         <h1>Documentation</h1>
       </div>
 
-      {/* Why This Project? */}
       <div className={styles.card}>
         <div className={styles.cardHeader}>
           <i className="fas fa-question-circle"></i>
@@ -36,7 +34,6 @@ const DocumentationPage = () => {
         </div>
       </div>
 
-      {/* Technologies Used */}
       <div className={styles.card}>
         <div className={styles.cardHeader}>
           <i className="fas fa-microchip"></i>
@@ -88,7 +85,6 @@ const DocumentationPage = () => {
         </div>
       </div>
 
-      {/* How It Works */}
       <div className={styles.card}>
         <div className={styles.cardHeader}>
           <i className="fas fa-cogs"></i>

@@ -1,17 +1,16 @@
-/* ── Card Styles (Same as before) ── */
 .card {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 10px 14px;
   border-radius: 10px;
-  border: 1px solid var(--border);
+  border: 1px solid #e8eaff;
   margin-bottom: 8px;
-  background: var(--bg-light);
+  background: #f8f9ff;
   transition: box-shadow 0.15s;
 }
 .card:hover {
-  box-shadow: 0 2px 12px rgba(108,99,255,0.15);
+  box-shadow: 0 2px 12px rgba(43, 34, 95, 0.15);
 }
 .left {
   display: flex;
@@ -22,7 +21,7 @@
   width: 30px;
   height: 30px;
   border-radius: 8px;
-  background: #3e39a3;
+  background: #2b225f;
   color: white;
   display: flex;
   align-items: center;
@@ -33,12 +32,12 @@
 }
 .txId {
   font-size: 12px;
-  color: var(--text-dark);
+  color: #1a1f3a;
 }
-.txId strong { color: var(--text-dark); }
+.txId strong { color: #1a1f3a; }
 .timestamp {
   font-size: 11px;
-  color: var(--text-muted);
+  color: #8a8fba;
   margin-top: 2px;
 }
 .timestamp i {
@@ -54,7 +53,6 @@
 .statusOrange { background:#fff8ee; color:#cc7700; border:1px solid #ffdda0; }
 .statusGreen  { background:#f0fff8; color:#226644; border:1px solid #b0ecd0; }
 
-/* ── Overlay ── */
 .overlay {
   position: fixed;
   inset: 0;
@@ -72,7 +70,6 @@
   to { opacity: 1; }
 }
 
-/* ── Popup Box ── */
 .popupBox {
   background: #ffffff;
   border-radius: 24px;
@@ -97,7 +94,6 @@
   }
 }
 
-/* ── Popup Header ── */
 .popupHeader {
   background: #2b225f;
   padding: 20px 24px;
@@ -152,7 +148,6 @@
   font-size: 16px;
 }
 
-/* ── Popup Content ── */
 .popupContent {
   padding: 24px;
   overflow-y: auto;
@@ -172,12 +167,12 @@
   font-weight: 500;
 }
 
-/* Sections */
 .section {
   background: #f8f9ff;
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 12px;
+  border-left: 4px solid #2b225f;
 }
 
 .sectionTitle {
@@ -189,6 +184,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  color: #2b225f;
 }
 
 .sectionBody {
@@ -197,33 +193,16 @@
   line-height: 1.6;
 }
 
-/* Section colors */
-.blue { border-left: 4px solid #3b82f6; background: #eff6ff; }
-.blue .sectionTitle { color: #3b82f6; }
-
-.amber { border-left: 4px solid #f59e0b; background: #fffbeb; }
-.amber .sectionTitle { color: #f59e0b; }
-
-.red { border-left: 4px solid #ef4444; background: #fef2f2; }
-.red .sectionTitle { color: #ef4444; }
-
-.green { border-left: 4px solid #10b981; background: #ecfdf5; }
-.green .sectionTitle { color: #10b981; }
-
-.purple { border-left: 4px solid #8b5cf6; background: #f5f3ff; }
-.purple .sectionTitle { color: #8b5cf6; }
-
-/* Fix Box */
 .fixBox {
-  background: #fffbeb;
-  border: 1px solid #f59e0b;
+  background: #f8f9ff;
+  border: 1px solid #2b225f;
   border-radius: 12px;
   padding: 16px;
   margin-top: 8px;
 }
 
 .fixTitle {
-  color: #f59e0b;
+  color: #2b225f;
   font-weight: 700;
   font-size: 12px;
   margin-bottom: 8px;
@@ -234,12 +213,11 @@
 }
 
 .fixBody {
-  color: #92400e;
+  color: #1a1f3a;
   font-size: 13px;
   line-height: 1.6;
 }
 
-/* ── Popup Footer ── */
 .popupFooter {
   padding: 16px 24px;
   border-top: 1px solid #e8eaff;
@@ -264,7 +242,6 @@
   transform: translateY(-1px);
 }
 
-/* Scrollbar */
 .popupContent::-webkit-scrollbar {
   width: 6px;
 }

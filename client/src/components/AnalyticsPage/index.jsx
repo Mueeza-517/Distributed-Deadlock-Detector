@@ -39,7 +39,7 @@ const AnalyticsPage = ({ deadlocks = [] }) => {
     }
   };
 
-  // Sample data for charts (will be replaced with real data from backend)
+
   const monthlyData = [
     { month: 'Jan', deadlocks: 29, resolved: 25 },
     { month: 'Feb', deadlocks: 35, resolved: 32 },
@@ -61,13 +61,11 @@ const AnalyticsPage = ({ deadlocks = [] }) => {
   return (
     <div className={styles.container}>
       
-      {/* Title */}
       <div className={styles.titleSection}>
         <i className="fas fa-chart-line"></i>
         <h1>Analytics</h1>
       </div>
 
-      {/* Stats Cards */}
       <div className={styles.statsGrid}>
         <div className={styles.statCard}>
           <i className="fas fa-chart-simple"></i>
@@ -99,7 +97,6 @@ const AnalyticsPage = ({ deadlocks = [] }) => {
         </div>
       </div>
 
-      {/* Monthly Trends Chart */}
       <div className={styles.chartCard}>
         <div className={styles.chartHeader}>
           <i className="fas fa-chart-bar"></i>
@@ -123,7 +120,6 @@ const AnalyticsPage = ({ deadlocks = [] }) => {
         </div>
       </div>
 
-      {/* Hourly Pattern Chart */}
       <div className={styles.chartCard}>
         <div className={styles.chartHeader}>
           <i className="fas fa-chart-line"></i>

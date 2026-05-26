@@ -33,7 +33,6 @@ const HelpPopup = ({ isOpen, onClose }) => {
           </button>
         </div>
         
-        {/* Content */}
         <div className={styles.content}>
           <div className={styles.section}>
             <h3>
@@ -84,7 +83,6 @@ const HelpPopup = ({ isOpen, onClose }) => {
           </div>
         </div>
 
-        {/* Footer with Close Button */}
         <div className={styles.footer}>
           <button className={styles.closeButton} onClick={onClose}>
             Close

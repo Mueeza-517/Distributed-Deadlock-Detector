@@ -16,12 +16,11 @@ const Navbar = ({ onPageChange }) => {
   const [activeItem, setActiveItem] = useState('overview');
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
-  // Saare menu items - Sab dikhenge
   const menuItems = [
     { id: 'overview', icon: <i className="fas fa-chart-pie"></i>, label: 'Overview' },
     { id: 'analytics', icon: <i className="fas fa-chart-line"></i>, label: 'Analytics' },
     { id: 'documentation', icon: <i className="fas fa-file-alt"></i>, label: 'Documentation' },
-    { id: 'deadlocks', icon: <i className="fas fa-exclamation-triangle"></i>, label: 'Deadlocks' },
+    { id: 'graph', icon: <i className="fas fa-project-diagram"></i>, label: 'Graph' },
     { id: 'shared', icon: <i className="fas fa-share-alt"></i>, label: 'Shared' },
   ];
 
@@ -39,7 +38,6 @@ const Navbar = ({ onPageChange }) => {
   return (
     <>
       <aside className={styles.sidebar}>
-        {/* Logo Section */}
         <div className={styles.logoWrap}>
           <div>
             <p className={styles.logoTitle}>DEADLOCK</p>
@@ -47,7 +45,6 @@ const Navbar = ({ onPageChange }) => {
           </div>
         </div>
 
-        {/* Navigation Menu - Saare items yahan dikhenge */}
         <nav className={styles.nav}>
           {menuItems.map((item) => (
             <NavItem 
@@ -60,9 +57,7 @@ const Navbar = ({ onPageChange }) => {
           ))}
         </nav>
 
-        {/* Bottom Section */}
         <div className={styles.navBottom}>
-          {/* Help Button */}
           <NavItem 
             icon={<i className="fas fa-question-circle"></i>} 
             label="Help" 
@@ -70,7 +65,6 @@ const Navbar = ({ onPageChange }) => {
             onClick={handleHelpClick}
           />
           
-          {/* User Card */}
           <div className={styles.userCard}>
             <div className={styles.userAvatar}>
               <i className="fas fa-user"></i>
@@ -83,7 +77,6 @@ const Navbar = ({ onPageChange }) => {
         </div>
       </aside>
 
-      {/* Help Popup */}
       <HelpPopup isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
     </>
   );

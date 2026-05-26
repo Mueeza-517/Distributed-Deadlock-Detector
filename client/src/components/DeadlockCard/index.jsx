@@ -57,7 +57,6 @@ const DeadlockCard = ({ deadlock, index }) => {
 
   return (
     <>
-      {/* Card */}
       <div
         className={styles.card}
         onClick={handleClick}
@@ -84,7 +83,6 @@ const DeadlockCard = ({ deadlock, index }) => {
         </div>
       </div>
 
-      {/* Popup - Help Popup Style */}
       {popup && (
         <div className={styles.overlay} onClick={() => setPopup(null)}>
           <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
@@ -100,7 +98,6 @@ const DeadlockCard = ({ deadlock, index }) => {
               </button>
             </div>
 
-            {/* Content */}
             <div className={styles.popupContent}>
               {/* Event ID */}
               <div className={styles.eventId}>
@@ -108,16 +105,15 @@ const DeadlockCard = ({ deadlock, index }) => {
                 <span>Event #{deadlock.id}</span>
               </div>
 
-              {/* Sections */}
               {[
-                { key: 'SITUATION', icon: <i className="fas fa-info-circle"></i>, cls: styles.blue },
-                { key: 'ROOT CAUSE', icon: <i className="fas fa-search"></i>, cls: styles.amber },
-                { key: 'VICTIM SELECTION', icon: <i className="fas fa-crosshairs"></i>, cls: styles.red },
-                { key: 'RESOLUTION', icon: <i className="fas fa-check-circle"></i>, cls: styles.green },
-                { key: 'PREVENTION', icon: <i className="fas fa-shield-alt"></i>, cls: styles.purple },
-              ].map(({ key, icon, cls }) =>
+                { key: 'SITUATION', icon: <i className="fas fa-info-circle"></i> },
+                { key: 'ROOT CAUSE', icon: <i className="fas fa-search"></i> },
+                { key: 'VICTIM SELECTION', icon: <i className="fas fa-crosshairs"></i> },
+                { key: 'RESOLUTION', icon: <i className="fas fa-check-circle"></i> },
+                { key: 'PREVENTION', icon: <i className="fas fa-shield-alt"></i> },
+              ].map(({ key, icon }) =>
                 sections[key] ? (
-                  <div key={key} className={`${styles.section} ${cls}`}>
+                  <div key={key} className={styles.section}>
                     <div className={styles.sectionTitle}>
                       {icon} {key}
                     </div>
@@ -128,7 +124,6 @@ const DeadlockCard = ({ deadlock, index }) => {
                 ) : null
               )}
 
-              {/* Suggested Fix */}
               {popup.suggested_fix && (
                 <div className={styles.fixBox}>
                   <div className={styles.fixTitle}>
@@ -139,7 +134,6 @@ const DeadlockCard = ({ deadlock, index }) => {
               )}
             </div>
 
-            {/* Footer */}
             <div className={styles.popupFooter}>
               <button className={styles.footerCloseBtn} onClick={() => setPopup(null)}>
                 Close

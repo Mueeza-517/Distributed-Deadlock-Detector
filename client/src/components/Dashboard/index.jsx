@@ -32,7 +32,6 @@ const Dashboard = ({ deadlocks = [], loading, error, refresh, simulate }) => {
 
   return (
     <div className={styles.mainArea}>
-      {/* Topbar */}
       <div className={styles.topbar}>
         <div>
           <p className={styles.breadcrumb}>Dashboard / Overview</p>
