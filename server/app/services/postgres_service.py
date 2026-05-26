@@ -69,7 +69,26 @@ def get_all_transactions() -> list:
 
     return transactions
 
-
+def select_victim(tx_id1: int, tx_id2: int) -> int:
+    """
+    Lower priority wala kill karo
+    Same priority ho toh latest wala kill karo
+    """
+    conn = get_postgres_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT tx_id FROM transactions
+            WHERE tx_id IN (%s, %s)
+            ORDER BY priority DESC, started_at DESC
+            LIMIT 1
+        """, (tx_id1, tx_id2))
+        row = cur.fetchone()
+        cur.close()
+        return row[0] if row else tx_id2
+    finally:
+        release_conn(conn)
+        
 # ─────────────────────────────────────────
 # LOCK FUNCTIONS
 # ─────────────────────────────────────────

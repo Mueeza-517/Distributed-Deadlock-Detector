@@ -1,7 +1,9 @@
-# postgres_client.py — replace kar do puri file
+import psycopg2
 from psycopg2 import pool
+import os
+from dotenv import load_dotenv, find_dotenv
+load_dotenv(find_dotenv())
 
-# Ek baar pool banao — reuse karo
 _connection_pool = None
 
 def get_pool():
@@ -10,10 +12,10 @@ def get_pool():
         _connection_pool = pool.SimpleConnectionPool(
             minconn=2,
             maxconn=10,
-            host="localhost",
-            database="deadlock_db",
-            user="postgres",
-            password="pass123"
+            host=os.getenv("PG_HOST", "localhost"),
+            database=os.getenv("PG_DB", "deadlock_db"),
+            user=os.getenv("PG_USER", "postgres"),
+            password=os.getenv("PG_PASSWORD", "pass123")
         )
         print("✅ PostgreSQL connection pool created!")
     return _connection_pool

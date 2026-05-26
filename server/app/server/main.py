@@ -7,6 +7,13 @@ from datetime import datetime
 import random
 import string
 
+from app.services.neo4j_service import (
+    create_transaction_node,
+    create_waits_for_edge,
+    detect_deadlock_cycle,
+    get_wait_for_graph,
+    clear_resolved_transaction
+)
 from app.services.postgres_service import (
     insert_transaction,
     insert_lock,
@@ -14,13 +21,13 @@ from app.services.postgres_service import (
     get_recent_deadlocks,
     get_all_transactions,
     get_waiting_locks,
-    get_node_info
+    get_node_info,
+    select_victim
 )
 from app.services.mongo_service import (
     save_raw_log,
     save_llm_explanation,
     get_recent_logs,
-    get_error_logs,
     get_explanation_by_event
 )
 from app.llm_client import explain_deadlock, get_prevention_tip
@@ -37,13 +44,6 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-)
-from app.services.neo4j_service import (
-    create_transaction_node,
-    create_waits_for_edge,
-    detect_deadlock_cycle,
-    get_wait_for_graph,
-    clear_resolved_transaction
 )
 
 # ─────────────────────────────────────────
@@ -128,27 +128,19 @@ def simulate_deadlock():
             "tx2_waiting": res1
         }
         llm_response = explain_deadlock(deadlock_info)
-
-        # Prevention tip lo
         prevention_tip = get_prevention_tip(res1, res2)
 
-        # Deadlock event save karo
+        # Real victim selection — priority + time based
+        victim_id = select_victim(tx1_id, tx2_id)
+        victim_name = tx2_name if victim_id == tx2_id else tx1_name
+        survivor_name = tx1_name if victim_id == tx2_id else tx2_name
+
+        # Deadlock event PostgreSQL mein save karo
         event_id = save_deadlock_event(
             tx_ids=[tx1_id, tx2_id],
-            resolved_by=f"killed_{tx2_name}",
+            resolved_by=f"killed_{victim_name}",
             resolution_time_ms=random.randint(100, 500)
         )
-        # Neo4j mein graph update karo
-        create_transaction_node(tx1_id, tx1_name, "node-1")
-        create_transaction_node(tx2_id, tx2_name, "node-2")
-        create_waits_for_edge(tx1_id, tx2_id, res2)
-        create_waits_for_edge(tx2_id, tx1_id, res1)
-
-        # Cycle detect karo
-        cycles = detect_deadlock_cycle()
-
-        # Resolved transaction clean karo
-        clear_resolved_transaction(tx2_id)
 
         # LLM explanation MongoDB mein save karo
         save_llm_explanation(
@@ -158,8 +150,20 @@ def simulate_deadlock():
                 f"{tx2_name} held {res2}, waited {res1}."
             ),
             llm_response=llm_response,
-            suggested_fix=f"Kill {tx2_name} to break the cycle."
+            suggested_fix=f"Kill {victim_name} to break the cycle."
         )
+
+        # Neo4j mein wait-for graph banao
+        create_transaction_node(tx1_id, tx1_name, "node-1")
+        create_transaction_node(tx2_id, tx2_name, "node-2")
+        create_waits_for_edge(tx1_id, tx2_id, res2)
+        create_waits_for_edge(tx2_id, tx1_id, res1)
+
+        # Real cycle detection
+        cycles = detect_deadlock_cycle()
+
+        # Victim ko graph se hatao
+        clear_resolved_transaction(victim_id)
 
         # Node info fetch karo
         node_info = get_node_info("node-1")
@@ -173,41 +177,16 @@ def simulate_deadlock():
                 "resources_involved": [res1, res2],
                 "llm_explanation": llm_response,
                 "prevention_tip": prevention_tip,
-                "suggested_fix": f"Kill {tx2_name} to break the cycle.",
+                "suggested_fix": f"Kill {victim_name} — lower priority transaction.",
+                "survivor": survivor_name,
                 "status": "resolved",
                 "node": node_info["node_id"],
                 "server_location": node_info["location"],
                 "graph_cycle_detected": len(cycles) > 0,
+                "cycle_length": len(cycles[0]["tx_ids"]) - 1 if cycles else 0,
             }
         }
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    
-    # ─────────────────────────────────────────
-# 10. WAIT-FOR GRAPH (Neo4j)
-# ─────────────────────────────────────────
-@app.get("/api/v1/graph")
-def get_graph():
-    try:
-        graph = get_wait_for_graph()
-        return graph
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-# ─────────────────────────────────────────
-# 11. DETECT CYCLE (Neo4j)
-# ─────────────────────────────────────────
-@app.get("/api/v1/detect")
-def detect_cycle():
-    try:
-        cycles = detect_deadlock_cycle()
-        return {
-            "cycles_found": len(cycles),
-            "deadlock_detected": len(cycles) > 0,
-            "cycles": cycles
-        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -303,5 +282,31 @@ def get_explanation(event_id: int):
         return explanation
     except HTTPException:
         raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ─────────────────────────────────────────
+# 10. WAIT-FOR GRAPH (Neo4j)
+# ─────────────────────────────────────────
+@app.get("/api/v1/graph")
+def get_graph():
+    try:
+        graph = get_wait_for_graph()
+        return graph
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ─────────────────────────────────────────
+# 11. DETECT CYCLE (Neo4j)
+# ─────────────────────────────────────────
+@app.get("/api/v1/detect")
+def detect_cycle():
+    try:
+        cycles = detect_deadlock_cycle()
+        return {
+            "cycles_found": len(cycles),
+            "deadlock_detected": len(cycles) > 0,
+            "cycles": cycles
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
