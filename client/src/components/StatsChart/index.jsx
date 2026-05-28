@@ -1,13 +1,15 @@
 import styles from './styles.module.css';
 
+// FIX: props resolved aur detected accept karo — default 0
 const StatsChart = ({
-  resolved = 60,
-  detected = 40,
+  resolved = 0,
+  detected = 0,
 }) => {
   const total = resolved + detected;
 
-  const resolvedPercent = Math.round((resolved / total) * 100);
-  const detectedPercent = Math.round((detected / total) * 100);
+  // Agar koi data nahi toh equal split dikhao
+  const resolvedPercent = total > 0 ? Math.round((resolved / total) * 100) : 50;
+  const detectedPercent = total > 0 ? Math.round((detected / total) * 100) : 50;
 
   return (
     <div className={styles.card}>
@@ -26,7 +28,7 @@ const StatsChart = ({
           }}
         >
           <div className={styles.innerCircle}>
-            <span>{resolvedPercent}%</span>
+            <span>{total > 0 ? `${resolvedPercent}%` : '—'}</span>
           </div>
         </div>
 

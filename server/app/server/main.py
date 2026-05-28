@@ -74,6 +74,7 @@ def get_deadlocks():
                 "transactions": event["tx_ids_involved"],
                 "resolved_by": event["resolved_by"],
                 "resolution_time_ms": event["resolution_time_ms"],
+                # FIX 1: status "resolved" sahi hai — dashboard mein resolved count fix
                 "status": "resolved",
                 "node": node_info["node_id"],
                 "server_location": node_info["location"]
@@ -130,7 +131,7 @@ def simulate_deadlock():
         llm_response = explain_deadlock(deadlock_info)
         prevention_tip = get_prevention_tip(res1, res2)
 
-        # Real victim selection — priority + time based
+        # Real victim selection
         victim_id = select_victim(tx1_id, tx2_id)
         victim_name = tx2_name if victim_id == tx2_id else tx1_name
         survivor_name = tx1_name if victim_id == tx2_id else tx2_name
@@ -153,17 +154,21 @@ def simulate_deadlock():
             suggested_fix=f"Kill {victim_name} to break the cycle."
         )
 
-        # Neo4j mein wait-for graph banao
-        create_transaction_node(tx1_id, tx1_name, "node-1")
-        create_transaction_node(tx2_id, tx2_name, "node-2")
-        create_waits_for_edge(tx1_id, tx2_id, res2)
-        create_waits_for_edge(tx2_id, tx1_id, res1)
-
-        # Real cycle detection
-        cycles = detect_deadlock_cycle()
-
-        # Victim ko graph se hatao
-        clear_resolved_transaction(victim_id)
+        # FIX 2: Neo4j block try/except mein — Neo4j slow start ho toh crash na ho
+        cycles = []
+        neo4j_ok = False
+        try:
+            create_transaction_node(tx1_id, tx1_name, "node-1")
+            create_transaction_node(tx2_id, tx2_name, "node-2")
+            create_waits_for_edge(tx1_id, tx2_id, res2)
+            create_waits_for_edge(tx2_id, tx1_id, res1)
+            cycles = detect_deadlock_cycle()
+            # FIX 3: victim delete karo SIMULATE ke baad nahi — graph dikhne do
+            # clear_resolved_transaction(victim_id)  # <-- commented out
+            neo4j_ok = True
+            print(f"✅ Neo4j graph updated! Cycles: {len(cycles)}")
+        except Exception as neo4j_err:
+            print(f"⚠️ Neo4j warning (non-fatal): {neo4j_err}")
 
         # Node info fetch karo
         node_info = get_node_info("node-1")
@@ -184,6 +189,7 @@ def simulate_deadlock():
                 "server_location": node_info["location"],
                 "graph_cycle_detected": len(cycles) > 0,
                 "cycle_length": len(cycles[0]["tx_ids"]) - 1 if cycles else 0,
+                "neo4j_connected": neo4j_ok,
             }
         }
 
@@ -236,7 +242,7 @@ def get_nodes():
         raise HTTPException(status_code=500, detail=str(e))
 
 # ─────────────────────────────────────────
-# 8. STATS
+# 8. STATS — FIX 4: real resolved count
 # ─────────────────────────────────────────
 @app.get("/api/v1/stats")
 def get_stats():
@@ -262,6 +268,8 @@ def get_stats():
             "avg_resolution_ms": round(avg_ms, 2),
             "most_affected_resource": top_resource,
             "resolved_percentage": 100,
+            "resolved_count": total,      # FIX: sab resolved hain
+            "detected_count": total,
             "active_nodes": 3
         }
     except Exception as e:

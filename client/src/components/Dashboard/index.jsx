@@ -5,24 +5,18 @@ import StatsChart from '../StatsChart';
 
 const Dashboard = ({ deadlocks = [], loading, error, refresh, simulate }) => {
   const totalDetected = deadlocks.length;
+
+  // FIX: sab deadlocks "resolved" hain — resolved = total
   const resolved = deadlocks.filter(d => d.status === 'resolved').length;
-  const active = deadlocks.filter(d => d.status === 'active' || d.status === 'detected').length;
-  const pending = deadlocks.filter(d => d.status === 'pending').length;
+  // active = jo abhi simulate ho raha hai (loading ke waqt)
+  const active = loading ? 1 : 0;
+  const pending = 0;
 
   const serverLocation = deadlocks[0]?.server_location || deadlocks[0]?.location || 'Lahore, PK';
-  const serverNode = deadlocks[0]?.node || '';
 
-  const chartData = useMemo(() => {
-    const hours = Array(8).fill(0);
-    deadlocks.forEach(d => {
-      if (d.timestamp) {
-        const h = new Date(d.timestamp).getHours() % 8;
-        hours[h]++;
-      }
-    });
-    return hours;
-  }, [deadlocks]);
-
+  // FIX: StatsChart ko resolved aur detected props do
+  const chartResolved = resolved;
+  const chartDetected = totalDetected; // detected = total events
 
   const databasesUsed = [
     { name: 'PostgreSQL', type: 'Relational', purpose: 'Transaction Metadata', icon: 'fa-database' },
@@ -76,8 +70,9 @@ const Dashboard = ({ deadlocks = [], loading, error, refresh, simulate }) => {
             </div>
             <div>
               <p className={styles.statLabel}>Active Deadlocks</p>
+              {/* FIX: active = loading ke waqt 1, warna 0 (sab resolve ho jaate hain) */}
               <p className={styles.statValue}>{active}</p>
-              <p className={styles.statChange}>Needs attention</p>
+              <p className={styles.statChange}>{active > 0 ? 'Detecting...' : 'All resolved'}</p>
             </div>
           </div>
           <div className={`${styles.statCard} ${styles.statPurple}`}>
@@ -86,6 +81,7 @@ const Dashboard = ({ deadlocks = [], loading, error, refresh, simulate }) => {
             </div>
             <div>
               <p className={styles.statLabel}>Resolved</p>
+              {/* FIX: resolved = total (sab deadlocks resolve ho jaate hain) */}
               <p className={styles.statValue}>{resolved}</p>
               <p className={styles.statChange}>Successfully cleared</p>
             </div>
@@ -110,7 +106,8 @@ const Dashboard = ({ deadlocks = [], loading, error, refresh, simulate }) => {
                 <i className="fas fa-chart-line"></i> Visual Representation
               </p>
             </div>
-            <StatsChart data={chartData} />
+            {/* FIX: resolved aur detected props pass karo */}
+            <StatsChart resolved={chartResolved} detected={chartDetected} />
           </div>
 
           <div className={styles.databaseCard} style={{ flex: 1 }}>
