@@ -22,7 +22,7 @@ def insert_transaction(tx_name: str, node_id: str) -> int:
 
 def update_transaction_status(tx_id: int, status: str):
     """
-    Transaction ka status update karo
+    Transaction ka status update karos
     status: 'active', 'committed', 'aborted'
     """
     conn = get_postgres_conn()
@@ -36,7 +36,8 @@ def update_transaction_status(tx_id: int, status: str):
 
     conn.commit()
     cur.close()
-    conn.close()
+    cur.close()
+    release_conn(conn)
     print(f"✅ Transaction {tx_id} status updated to: {status}")
 
 
@@ -55,7 +56,8 @@ def get_all_transactions() -> list:
 
     rows = cur.fetchall()
     cur.close()
-    conn.close()
+    cur.close()
+    release_conn(conn)
 
     transactions = []
     for row in rows:
@@ -112,7 +114,8 @@ def insert_lock(tx_id: int, resource_name: str,
     lock_id = cur.fetchone()[0]
     conn.commit()
     cur.close()
-    conn.close()
+    cur.close()
+    release_conn(conn)
 
     print(f"✅ Lock inserted on {resource_name} "
           f"by Tx {tx_id} (waiting: {is_waiting})")
@@ -137,7 +140,8 @@ def get_waiting_locks() -> list:
 
     rows = cur.fetchall()
     cur.close()
-    conn.close()
+    cur.close()
+    release_conn(conn)
 
     locks = []
     for row in rows:
@@ -194,7 +198,8 @@ def get_recent_deadlocks(limit: int = 10) -> list:
 
     rows = cur.fetchall()
     cur.close()
-    conn.close()
+    cur.close()
+    release_conn(conn)
 
     events = []
     for row in rows:

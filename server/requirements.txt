@@ -1,8 +1,10 @@
 fastapi
 uvicorn
+neo4j
 psycopg2-binary
 pymongo
-neo4j
-huggingface_hub
 python-dotenv
+huggingface_hub[inference]
+requests
 pydantic
+python-multipart

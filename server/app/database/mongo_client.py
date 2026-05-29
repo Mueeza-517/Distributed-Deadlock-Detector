@@ -1,7 +1,9 @@
 from pymongo import MongoClient, ASCENDING, DESCENDING
+import os  # ← YEH LINE ADD KARO
 
 def get_mongo_db():
-    client = MongoClient("mongodb://localhost:27017/")
+    MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")  # ← YEH BADLO
+    client = MongoClient(MONGO_URI)
     db = client["deadlock_logs"]
     return db
 
