@@ -63,17 +63,6 @@ services:
       - deadlock-network
     restart: unless-stopped
 
-  # ✅ Client Service Added
-  client:
-    build: ./client
-    container_name: deadlock_client
-    ports:
-      - "5173:5173"
-    depends_on:
-      - backend
-    networks:
-      - deadlock-network
-    restart: unless-stopped
 
 networks:
   deadlock-network:
