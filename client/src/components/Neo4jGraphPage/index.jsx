@@ -3,7 +3,6 @@ import styles from './styles.module.css';
 
 const Neo4jGraphPage = () => {
   const [graphData, setGraphData] = useState(null);
-  const [cycleData, setCycleData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedNode, setSelectedNode] = useState(null);
@@ -16,20 +15,11 @@ const Neo4jGraphPage = () => {
     setLoading(true);
     setError(null);
     try {
-      // ✅ FIXED: correct endpoint
-      const [graphRes, cycleRes] = await Promise.all([
-        fetch('http://localhost:8000/api/v1/graph'),
-        fetch('http://localhost:8000/api/v1/detect'),
-      ]);
-
-      if (!graphRes.ok) throw new Error(`Graph API: HTTP ${graphRes.status}`);
-      const graph = await graphRes.json();
+      const response = await fetch('http://localhost:8000/api/v1/graph');
+      
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const graph = await response.json();
       setGraphData(graph);
-
-      if (cycleRes.ok) {
-        const cycle = await cycleRes.json();
-        setCycleData(cycle);
-      }
     } catch (err) {
       console.error('Failed to fetch Neo4j graph data:', err);
       setError(err.message);
@@ -38,7 +28,6 @@ const Neo4jGraphPage = () => {
     }
   };
 
-  // ✅ FIXED: Position nodes in a circle so they don't overlap
   const getNodePosition = (index, total) => {
     const cx = 350, cy = 220, r = 150;
     const angle = (2 * Math.PI * index) / Math.max(total, 1) - Math.PI / 2;
@@ -53,33 +42,18 @@ const Neo4jGraphPage = () => {
 
   return (
     <div className={styles.container}>
+      
+      {/* Title Section */}
       <div className={styles.titleSection}>
         <i className="fas fa-project-diagram"></i>
-        <h1 className={styles.title}>Neo4j Wait-For Graph</h1>
+        <h1 className={styles.title}>Graph</h1>
         <button className={styles.refreshBtn} onClick={fetchGraphData} disabled={loading}>
           <i className="fas fa-sync-alt"></i>
           {loading ? ' Loading...' : ' Refresh'}
         </button>
       </div>
 
-      {/* Cycle Detection Banner */}
-      {cycleData && (
-        <div style={{
-          margin: '0 24px 16px',
-          padding: '12px 20px',
-          borderRadius: '8px',
-          background: cycleData.deadlock_detected ? '#3b1a1a' : '#1a3b1a',
-          border: `1px solid ${cycleData.deadlock_detected ? '#ef4444' : '#22c55e'}`,
-          color: cycleData.deadlock_detected ? '#ef4444' : '#22c55e',
-          fontWeight: '600',
-          fontSize: '14px',
-        }}>
-          {cycleData.deadlock_detected
-            ? `⚠️ Deadlock Detected! ${cycleData.cycles_found} cycle(s) found in wait-for graph.`
-            : '✅ No deadlock detected — system healthy.'}
-        </div>
-      )}
-
+      {/* Info Card */}
       <div className={styles.infoCard}>
         <p>
           This graph shows real-time wait-for relationships between transactions in Neo4j.
@@ -88,6 +62,7 @@ const Neo4jGraphPage = () => {
         </p>
       </div>
 
+      {/* Graph Container */}
       <div className={styles.graphContainer}>
         {loading ? (
           <div className={styles.loadingWrap}>
@@ -115,15 +90,13 @@ const Neo4jGraphPage = () => {
                 </marker>
               </defs>
 
-              {/* ✅ FIXED: use edges (not relationships), from/to fields */}
+              {/* Edges */}
               {edges.map((edge, idx) => {
                 const fromIdx = nodes.findIndex(n => n.id === edge.from);
                 const toIdx = nodes.findIndex(n => n.id === edge.to);
                 if (fromIdx === -1 || toIdx === -1) return null;
                 const fromPos = getNodePosition(fromIdx, nodes.length);
                 const toPos = getNodePosition(toIdx, nodes.length);
-
-                // Midpoint for label
                 const mx = (fromPos.x + toPos.x) / 2;
                 const my = (fromPos.y + toPos.y) / 2;
 
@@ -140,16 +113,11 @@ const Neo4jGraphPage = () => {
                     <text x={mx} y={my - 8} textAnchor="middle" fill="#ef4444" fontSize="10" fontWeight="bold">
                       WAITS_FOR
                     </text>
-                    {edge.resource && (
-                      <text x={mx} y={my + 12} textAnchor="middle" fill="#aaa" fontSize="9">
-                        {edge.resource}
-                      </text>
-                    )}
                   </g>
                 );
               })}
 
-              {/* ✅ FIXED: use nodes with id/name fields */}
+              {/* Nodes */}
               {nodes.map((node, idx) => {
                 const pos = getNodePosition(idx, nodes.length);
                 return (
@@ -172,6 +140,7 @@ const Neo4jGraphPage = () => {
               })}
             </svg>
 
+            {/* Legend */}
             <div className={styles.legend}>
               <div className={styles.legendTitle}>Legend</div>
               <div className={styles.legendItem}>
@@ -179,11 +148,12 @@ const Neo4jGraphPage = () => {
                 <span>Transaction Node</span>
               </div>
               <div className={styles.legendItem}>
-                <div className={styles.legendColorRed || styles.legendColor} style={{ background: '#ef4444' }}></div>
+                <div className={styles.legendColorRed}></div>
                 <span>WAITS_FOR (deadlock edge)</span>
               </div>
             </div>
 
+            {/* Selected Node Info */}
             {selectedNode && (
               <div className={styles.nodeInfo}>
                 <div className={styles.nodeInfoHeader}>
@@ -193,7 +163,11 @@ const Neo4jGraphPage = () => {
                 <div className={styles.nodeInfoContent}>
                   <p><strong>Name:</strong> {selectedNode.name}</p>
                   <p><strong>TX ID:</strong> {selectedNode.id}</p>
-                  <p><strong>Waiting for:</strong> {edges.filter(e => e.from === selectedNode.id).map(e => nodes.find(n => n.id === e.to)?.name || e.to).join(', ') || 'none'}</p>
+                  <p><strong>Waiting for:</strong> {
+                    edges.filter(e => e.from === selectedNode.id)
+                      .map(e => nodes.find(n => n.id === e.to)?.name || e.to)
+                      .join(', ') || 'none'
+                  }</p>
                 </div>
               </div>
             )}
@@ -201,25 +175,6 @@ const Neo4jGraphPage = () => {
         )}
       </div>
 
-      {/* Stats Summary */}
-      {graphData && (
-        <div style={{ display: 'flex', gap: '16px', margin: '16px 24px', flexWrap: 'wrap' }}>
-          <div style={{ background: '#1a1a2e', border: '1px solid #2b225f', borderRadius: '8px', padding: '12px 20px', minWidth: '120px' }}>
-            <p style={{ color: '#aaa', fontSize: '12px', margin: 0 }}>Total Transactions</p>
-            <p style={{ color: '#a78bfa', fontSize: '24px', fontWeight: 'bold', margin: 0 }}>{nodes.length}</p>
-          </div>
-          <div style={{ background: '#1a1a2e', border: '1px solid #2b225f', borderRadius: '8px', padding: '12px 20px', minWidth: '120px' }}>
-            <p style={{ color: '#aaa', fontSize: '12px', margin: 0 }}>Wait-for Edges</p>
-            <p style={{ color: '#ef4444', fontSize: '24px', fontWeight: 'bold', margin: 0 }}>{edges.length}</p>
-          </div>
-          {cycleData && (
-            <div style={{ background: '#1a1a2e', border: `1px solid ${cycleData.deadlock_detected ? '#ef4444' : '#22c55e'}`, borderRadius: '8px', padding: '12px 20px', minWidth: '120px' }}>
-              <p style={{ color: '#aaa', fontSize: '12px', margin: 0 }}>Cycles Found</p>
-              <p style={{ color: cycleData.deadlock_detected ? '#ef4444' : '#22c55e', fontSize: '24px', fontWeight: 'bold', margin: 0 }}>{cycleData.cycles_found}</p>
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 };
