@@ -1,5 +1,4 @@
 services:
-
   postgres:
     image: postgres:16
     container_name: deadlock_postgres
@@ -12,6 +11,8 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - deadlock-network
     restart: unless-stopped
 
   mongodb:
@@ -21,6 +22,8 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+    networks:
+      - deadlock-network
     restart: unless-stopped
 
   neo4j:
@@ -33,6 +36,8 @@ services:
       - "7687:7687"
     volumes:
       - neo4j_data:/data
+    networks:
+      - deadlock-network
     restart: unless-stopped
 
   backend:
@@ -54,7 +59,25 @@ services:
       - postgres
       - mongodb
       - neo4j
+    networks:
+      - deadlock-network
     restart: unless-stopped
+
+  # ✅ Client Service Added
+  client:
+    build: ./client
+    container_name: deadlock_client
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - deadlock-network
+    restart: unless-stopped
+
+networks:
+  deadlock-network:
+    driver: bridge
 
 volumes:
   postgres_data:
