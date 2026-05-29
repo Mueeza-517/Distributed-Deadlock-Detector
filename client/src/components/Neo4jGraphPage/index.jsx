@@ -43,7 +43,6 @@ const Neo4jGraphPage = () => {
   return (
     <div className={styles.container}>
       
-      {/* Title Section */}
       <div className={styles.titleSection}>
         <i className="fas fa-project-diagram"></i>
         <h1 className={styles.title}>Graph</h1>
@@ -62,7 +61,6 @@ const Neo4jGraphPage = () => {
         </p>
       </div>
 
-      {/* Graph Container */}
       <div className={styles.graphContainer}>
         {loading ? (
           <div className={styles.loadingWrap}>
@@ -90,7 +88,6 @@ const Neo4jGraphPage = () => {
                 </marker>
               </defs>
 
-              {/* Edges */}
               {edges.map((edge, idx) => {
                 const fromIdx = nodes.findIndex(n => n.id === edge.from);
                 const toIdx = nodes.findIndex(n => n.id === edge.to);
@@ -117,7 +114,6 @@ const Neo4jGraphPage = () => {
                 );
               })}
 
-              {/* Nodes */}
               {nodes.map((node, idx) => {
                 const pos = getNodePosition(idx, nodes.length);
                 return (
@@ -140,7 +136,6 @@ const Neo4jGraphPage = () => {
               })}
             </svg>
 
-            {/* Legend */}
             <div className={styles.legend}>
               <div className={styles.legendTitle}>Legend</div>
               <div className={styles.legendItem}>
