@@ -10,88 +10,67 @@ client = InferenceClient(
 )
 
 def explain_deadlock(deadlock_info: dict) -> str:
-    prompt = f"""You are an expert database administrator analyzing a distributed system deadlock.
+    """
+    Real LLM API call - HuggingFace Inference
+    """
+    prompt = f"""You are a database expert analyzing a distributed deadlock.
 
-DEADLOCK DETAILS:
-- Transaction 1: "{deadlock_info['tx1_name']}"
-  * Currently HOLDING lock on: {deadlock_info['tx1_holding']}
-  * Currently WAITING for: {deadlock_info['tx1_waiting']}
+DEADLOCK INFORMATION:
+- Transaction 1: {deadlock_info['tx1_name']} is HOLDING {deadlock_info['tx1_holding']} and WAITING FOR {deadlock_info['tx1_waiting']}
+- Transaction 2: {deadlock_info['tx2_name']} is HOLDING {deadlock_info['tx2_holding']} and WAITING FOR {deadlock_info['tx2_waiting']}
 
-- Transaction 2: "{deadlock_info['tx2_name']}"
-  * Currently HOLDING lock on: {deadlock_info['tx2_holding']}
-  * Currently WAITING for: {deadlock_info['tx2_waiting']}
+Please provide analysis in EXACTLY this format:
 
-Provide a structured analysis with EXACTLY these sections:
+SITUATION: (what happened in simple terms)
 
-SITUATION:
-[One sentence explaining what happened in simple terms]
+ROOT CAUSE: (why this deadlock occurred)
 
-ROOT CAUSE:
-[Explain why this circular wait occurred]
+VICTIM SELECTION: (which transaction should be killed and why)
 
-VICTIM SELECTION:
-[Which transaction to kill and why - consider that lower priority transactions should be terminated first]
+RESOLUTION: (steps to resolve this deadlock)
 
-RESOLUTION:
-[Exact steps taken to resolve this deadlock]
+PREVENTION: (how to prevent this in future)
 
-PREVENTION:
-[2-3 specific recommendations to prevent this in future]
+Keep response concise and professional."""
 
-Keep response clear, technical, and concise."""
+    try:
+        message = client.chat.completions.create(
+            model="meta-llama/Llama-3.3-70B-Instruct",
+            messages=[
+                {"role": "system", "content": "You are a senior database administrator. Respond only in the requested format."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=500,
+            temperature=0.3,
+        )
+        return message.choices[0].message.content
+    except Exception as e:
+        print(f"⚠️ LLM API Error: {e}")
+        # Fallback to mock response
+        return f"""SITUATION: Circular wait between {deadlock_info['tx1_name']} and {deadlock_info['tx2_name']}.
 
-    message = client.chat.completions.create(
-        model="meta-llama/Llama-3.3-70B-Instruct",
-        messages=[
-            {
-                "role": "system",
-                "content": "You are a senior database administrator. Always respond in the exact structured format requested. Be precise and technical."
-            },
-            {
-                "role": "user",
-                "content": prompt
-            }
-        ],
-        max_tokens=600,
-        temperature=0.3,
-    )
+ROOT CAUSE: Locks acquired in opposite order.
 
-    return message.choices[0].message.content
+VICTIM SELECTION: Kill {deadlock_info['tx2_name']}.
 
+RESOLUTION: Release locks, allow {deadlock_info['tx1_name']} to proceed.
+
+PREVENTION: Use consistent lock ordering."""
 
 def get_prevention_tip(resource1: str, resource2: str) -> str:
     """
-    Short prevention tip generate karo — DB mein save hogi
+    Short prevention tip from LLM
     """
-    prompt = f"""In one sentence, how to prevent deadlock between {resource1} and {resource2} in a distributed database? Be specific and technical."""
+    prompt = f"In one sentence, how to prevent deadlock between {resource1} and {resource2} in a distributed database?"
 
-    message = client.chat.completions.create(
-        model="meta-llama/Llama-3.3-70B-Instruct",
-        messages=[
-            {"role": "user", "content": prompt}
-        ],
-        max_tokens=100,
-        temperature=0.2,
-    )
-
-    return message.choices[0].message.content
-
-
-if __name__ == "__main__":
-    test_deadlock = {
-        "tx1_name": "Tx_Alpha",
-        "tx1_holding": "Table_Orders",
-        "tx1_waiting": "Table_Users",
-        "tx2_name": "Tx_Beta",
-        "tx2_holding": "Table_Users",
-        "tx2_waiting": "Table_Orders"
-    }
-
-    print("🤖 LLM Analysis:")
-    print("=" * 50)
-    result = explain_deadlock(test_deadlock)
-    print(result)
-    print("\n" + "=" * 50)
-    print("💡 Prevention Tip:")
-    tip = get_prevention_tip("Table_Orders", "Table_Users")
-    print(tip)
+    try:
+        message = client.chat.completions.create(
+            model="meta-llama/Llama-3.3-70B-Instruct",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=100,
+            temperature=0.2,
+        )
+        return message.choices[0].message.content
+    except Exception as e:
+        print(f"⚠️ Prevention tip API Error: {e}")
+        return f"Always acquire locks on {resource1} before {resource2} to prevent circular waits."
