@@ -1,6 +1,9 @@
 .list {
-  max-height: 220px;
-  overflow-y: auto;
+  max-height: 100%;     
+  overflow-y: visible;  
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .empty {

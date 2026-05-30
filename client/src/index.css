@@ -27,7 +27,7 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: var(--bg-light);
   color: var(--text-dark);
-  overflow: hidden;
+  overflow-y: auto;  
 }
 
 #root {
