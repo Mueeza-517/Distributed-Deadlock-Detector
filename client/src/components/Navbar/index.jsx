@@ -21,7 +21,6 @@ const Navbar = ({ onPageChange }) => {
     { id: 'analytics', icon: <i className="fas fa-chart-line"></i>, label: 'Analytics' },
     { id: 'documentation', icon: <i className="fas fa-file-alt"></i>, label: 'Documentation' },
     { id: 'graph', icon: <i className="fas fa-project-diagram"></i>, label: 'Graph' },
-    { id: 'shared', icon: <i className="fas fa-share-alt"></i>, label: 'Shared' },
   ];
 
   const handleMenuItemClick = (id) => {

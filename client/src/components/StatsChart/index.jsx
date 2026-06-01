@@ -1,15 +1,13 @@
 import styles from './styles.module.css';
 
-// FIX: props resolved aur detected accept karo — default 0
 const StatsChart = ({
   resolved = 0,
   detected = 0,
 }) => {
   const total = resolved + detected;
 
-  // Agar koi data nahi toh equal split dikhao
-  const resolvedPercent = total > 0 ? Math.round((resolved / total) * 100) : 50;
-  const detectedPercent = total > 0 ? Math.round((detected / total) * 100) : 50;
+  const resolvedPercent = 100;
+  const detectedPercent = 100;
 
   return (
     <div className={styles.card}>
@@ -22,13 +20,13 @@ const StatsChart = ({
           className={styles.pie}
           style={{
             background: `conic-gradient(
-              #3e39a3 0% ${resolvedPercent}%,
-              #2b225f ${resolvedPercent}% 100%
+              #3e39a3 100% ${resolvedPercent}%,
+              #2b225f ${resolvedPercent}% 0%
             )`,
           }}
         >
           <div className={styles.innerCircle}>
-            <span>{total > 0 ? `${resolvedPercent}%` : '—'}</span>
+            <span>100%</span>
           </div>
         </div>
 
