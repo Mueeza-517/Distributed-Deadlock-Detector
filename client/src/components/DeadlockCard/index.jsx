@@ -84,7 +84,7 @@ const DeadlockCard = ({ deadlock, index }) => {
       </div>
 
       {popup && (
-        <div className={styles.overlay} onClick={() => setPopup(null)}>
+        <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
           <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
             
             {/* Header */}
