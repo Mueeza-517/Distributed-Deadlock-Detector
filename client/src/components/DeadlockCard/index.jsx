@@ -99,7 +99,6 @@ const DeadlockCard = ({ deadlock, index }) => {
             </div>
 
             <div className={styles.popupContent}>
-              {/* Event ID */}
               <div className={styles.eventId}>
                 <i className="fas fa-hashtag"></i>
                 <span>Event #{deadlock.id}</span>

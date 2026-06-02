@@ -5,7 +5,7 @@ const DeadlockList = ({ deadlocks = [] }) => {
   if (deadlocks.length === 0) {
     return (
       <div className={styles.empty}>
-        <p>🎉 No deadlocks detected right now!</p>
+        <p> No deadlocks detected right now!</p>
         <p className={styles.emptySub}>System is running smoothly.</p>
       </div>
     );
