@@ -1,10 +1,10 @@
-# 🔍 Distributed Deadlock Detector
+#  Distributed Deadlock Detector
 
 A full-stack distributed database monitoring and visualization system that simulates, detects, analyzes, and resolves deadlocks using a hybrid multi-database architecture. The project combines PostgreSQL, MongoDB, Neo4j, FastAPI, React, and AI-powered analysis to provide an interactive environment for studying distributed deadlock management.
 
 ---
 
-## 📌 Table of Contents
+##  Table of Contents
 
 - Overview
 - System Architecture
@@ -21,12 +21,11 @@ A full-stack distributed database monitoring and visualization system that simul
 - How It Works
 - Database Responsibilities
 - Future Enhancements
-- Screenshots
 - Team
 
 ---
 
-# 📖 Overview
+#  Overview
 
 Distributed systems frequently encounter resource contention where multiple transactions compete for shared resources. When transactions wait indefinitely for one another, a deadlock occurs.
 
@@ -45,7 +44,7 @@ This project was developed as part of the **Advanced Database Management Systems
 
 ---
 
-# 🏗️ System Architecture
+#  System Architecture
 
 ```text
                     ┌─────────────────┐
@@ -76,17 +75,17 @@ This project was developed as part of the **Advanced Database Management Systems
 
 ---
 
-# ✨ Features
+#  Features
 
-### 🔄 Distributed Deadlock Simulation
+###  Distributed Deadlock Simulation
 
 Generate realistic deadlock scenarios involving multiple transactions and shared resources.
 
-### 🧠 AI-Powered Root Cause Analysis
+###  AI-Powered Root Cause Analysis
 
 Automatically generate natural language explanations of deadlock situations using Hugging Face LLMs.
 
-### 🗄️ Hybrid Multi-Database Architecture
+###  Hybrid Multi-Database Architecture
 
 Utilizes three database paradigms:
 
@@ -94,7 +93,7 @@ Utilizes three database paradigms:
 - Document Database (MongoDB)
 - Graph Database (Neo4j)
 
-### 📊 Real-Time Dashboard
+###  Real-Time Dashboard
 
 Monitor:
 
@@ -103,11 +102,11 @@ Monitor:
 - Deadlock history
 - Resolution statistics
 
-### 🕸️ Wait-For Graph Visualization
+###  Wait-For Graph Visualization
 
 Visualize transaction dependencies and deadlock cycles using Neo4j.
 
-### 📈 Analytics & Reporting
+###  Analytics & Reporting
 
 Analyze:
 
@@ -116,17 +115,14 @@ Analyze:
 - Resource contention patterns
 - Transaction trends
 
-### 🐳 Dockerized Deployment
 
-One-command deployment for backend services and databases.
-
-### 📄 Automatic API Documentation
+###  Automatic API Documentation
 
 Interactive Swagger documentation provided by FastAPI.
 
 ---
 
-# 📚 Concepts Demonstrated
+# Concepts Demonstrated
 
 This project demonstrates several advanced database concepts:
 
@@ -143,7 +139,7 @@ This project demonstrates several advanced database concepts:
 
 ---
 
-# 🛠️ Tech Stack
+#  Tech Stack
 
 | Layer | Technology |
 |---------|------------|
@@ -157,7 +153,7 @@ This project demonstrates several advanced database concepts:
 
 ---
 
-# 📁 Project Structure
+#  Project Structure
 
 ```text
 Distributed-Deadlock-Detector/
@@ -202,7 +198,7 @@ Distributed-Deadlock-Detector/
 
 ---
 
-# 🚀 Getting Started
+#  Getting Started
 
 ## Prerequisites
 
@@ -215,7 +211,7 @@ Install the following software:
 
 ---
 
-# 🐳 Docker Setup (Recommended)
+#  Docker Setup (Recommended)
 
 ### Clone Repository
 
@@ -251,7 +247,7 @@ npm run dev
 
 ---
 
-# 💻 Manual Setup
+#  Manual Setup
 
 ## PostgreSQL
 
@@ -312,7 +308,7 @@ npm run dev
 
 ---
 
-# 🔑 Environment Variables
+#  Environment Variables
 
 ```env
 PG_HOST=postgres
@@ -331,7 +327,7 @@ HF_TOKEN=your_huggingface_token
 
 ---
 
-# 📡 API Endpoints
+#  API Endpoints
 
 Base URL:
 
@@ -359,7 +355,7 @@ http://localhost:8000/docs
 
 ---
 
-# ⚙️ How It Works
+#  How It Works
 
 ```text
 User clicks Simulate
@@ -395,7 +391,7 @@ Dashboard Updated
 
 ---
 
-# 🗄️ Database Responsibilities
+# Database Responsibilities
 
 | Database | Responsibility |
 |------------|---------------|
@@ -405,7 +401,7 @@ Dashboard Updated
 
 ---
 
-# 🚀 Future Enhancements
+#  Future Enhancements
 
 - Multi-node distributed cluster simulation
 - Real-time PostgreSQL lock monitoring
@@ -418,39 +414,7 @@ Dashboard Updated
 
 ---
 
-# 📸 Screenshots
-
-### Dashboard
-
-![Dashboard](screenshots/Dashboard.png)
-
-### Wait-For Graph
-
-![Wait-For Graph](screenshots/Graph.png)
-
-### Analytics
-
-![Analytics Page](screenshots/Analytics.png)
-
-### Swagger API Documentation
-
-![API Documentation](screenshots/Documentation-1.png)
-![API Documentation](screenshots/Documentation-2.png)
-
----
-# 🏗️ System Architecture
-
-![Architecture](screenshots/architecture.png)
-
----
-
-## 🎥 Demo
-![Demo](screenshots/demo.gif)
-
-
-
----
-# 👥 Team 
+#  Team 
 
 | Name | Roll Number |
 |---------|------------|
@@ -459,10 +423,10 @@ Dashboard Updated
 | Mueeza Akbar | 2024-CS-34 |
 
 # Contributors
-| Musfirah Zainab | https://github.com/Musfirah-999
-| Mueeza Akbar | https://github.com/Mueeza-517
-| Aiman Rehman | https://github.com/AIMAN2244
 
+| Musfirah Zainab | https://github.com/Musfirah-999 |
+| Mueeza Akbar | https://github.com/Mueeza-517 |
+| Aiman Rehman | https://github.com/AIMAN2244 |
 
 ---
 
@@ -478,8 +442,3 @@ University of Engineering and Technology (UET), Lahore
 
 Advanced Database Management Systems (ADBMS)
 
----
-
-# 📝 License
-
-This project was developed for academic and educational purposes.

@@ -1,8 +1,8 @@
 from pymongo import MongoClient, ASCENDING, DESCENDING
-import os  # ← YEH LINE ADD KARO
+import os  
 
 def get_mongo_db():
-    MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")  # ← YEH BADLO
+    MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/") 
     client = MongoClient(MONGO_URI)
     db = client["deadlock_logs"]
     return db
@@ -10,7 +10,7 @@ def get_mongo_db():
 def setup_mongo_indexes():
     db = get_mongo_db()
 
-    # raw_logs — TTL 30 din
+   
     db.raw_logs.create_index(
         [("timestamp", ASCENDING)],
         expireAfterSeconds=30 * 24 * 60 * 60,
@@ -25,14 +25,14 @@ def setup_mongo_indexes():
         name="idx_log_level"
     )
 
-    # llm_explanations
+   
     db.llm_explanations.create_index(
         [("event_id", ASCENDING)],
         unique=True,
         name="idx_event_unique"
     )
 
-    # system_metrics — TTL 7 din
+
     db.system_metrics.create_index(
         [("timestamp", ASCENDING)],
         expireAfterSeconds=7 * 24 * 60 * 60,

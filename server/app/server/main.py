@@ -46,9 +46,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ─────────────────────────────────────────
-# 1. HEALTH CHECK
-# ─────────────────────────────────────────
 @app.get("/health")
 def health_check():
     return {
@@ -58,9 +55,6 @@ def health_check():
         "version": "1.0.0"
     }
 
-# ─────────────────────────────────────────
-# 2. GET ALL DEADLOCKS
-# ─────────────────────────────────────────
 @app.get("/api/v1/deadlocks")
 def get_deadlocks():
     try:
@@ -74,7 +68,6 @@ def get_deadlocks():
                 "transactions": event["tx_ids_involved"],
                 "resolved_by": event["resolved_by"],
                 "resolution_time_ms": event["resolution_time_ms"],
-                # FIX 1: status "resolved" sahi hai — dashboard mein resolved count fix
                 "status": "resolved",
                 "node": node_info["node_id"],
                 "server_location": node_info["location"]
@@ -83,19 +76,15 @@ def get_deadlocks():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# ─────────────────────────────────────────
-# 3. SIMULATE DEADLOCK
-# ─────────────────────────────────────────
 @app.post("/api/v1/deadlocks/simulate")
 def simulate_deadlock():
     try:
-        # Random transaction names
+        
         suffix1 = ''.join(random.choices(string.ascii_uppercase, k=3))
         suffix2 = ''.join(random.choices(string.ascii_uppercase, k=3))
         tx1_name = f"Tx_{suffix1}"
         tx2_name = f"Tx_{suffix2}"
 
-        # Random resources
         resources = [
             ("Table_Orders", "Table_Users"),
             ("Table_Products", "Table_Inventory"),
@@ -103,7 +92,7 @@ def simulate_deadlock():
         ]
         res1, res2 = random.choice(resources)
 
-        # PostgreSQL mein save karo
+      
         tx1_id = insert_transaction(tx1_name, "node-1")
         tx2_id = insert_transaction(tx2_name, "node-2")
 
@@ -112,14 +101,14 @@ def simulate_deadlock():
         insert_lock(tx1_id, res2, "exclusive", True)
         insert_lock(tx2_id, res1, "exclusive", True)
 
-        # MongoDB mein log karo
+        
         save_raw_log("node-1", "WARNING",
                      f"{tx1_name} waiting for {res2}")
         save_raw_log("node-2", "ERROR",
                      f"Deadlock detected between {tx1_name} and {tx2_name}",
                      extra_data={"tx_ids": [tx1_id, tx2_id]})
 
-        # LLM explanation lo
+      
         deadlock_info = {
             "tx1_name": tx1_name,
             "tx1_holding": res1,
@@ -131,19 +120,19 @@ def simulate_deadlock():
         llm_response = explain_deadlock(deadlock_info)
         prevention_tip = get_prevention_tip(res1, res2)
 
-        # Real victim selection
+        
         victim_id = select_victim(tx1_id, tx2_id)
         victim_name = tx2_name if victim_id == tx2_id else tx1_name
         survivor_name = tx1_name if victim_id == tx2_id else tx2_name
 
-        # Deadlock event PostgreSQL mein save karo
+        
         event_id = save_deadlock_event(
             tx_ids=[tx1_id, tx2_id],
             resolved_by=f"killed_{victim_name}",
             resolution_time_ms=random.randint(100, 500)
         )
 
-        # LLM explanation MongoDB mein save karo
+      
         save_llm_explanation(
             event_id=event_id,
             deadlock_summary=(
@@ -154,7 +143,7 @@ def simulate_deadlock():
             suggested_fix=f"Kill {victim_name} to break the cycle."
         )
 
-        # FIX 2: Neo4j block try/except mein — Neo4j slow start ho toh crash na ho
+        
         cycles = []
         neo4j_ok = False
         try:
@@ -163,14 +152,13 @@ def simulate_deadlock():
             create_waits_for_edge(tx1_id, tx2_id, res2)
             create_waits_for_edge(tx2_id, tx1_id, res1)
             cycles = detect_deadlock_cycle()
-            # FIX 3: victim delete karo SIMULATE ke baad nahi — graph dikhne do
-            # clear_resolved_transaction(victim_id)  # <-- commented out
+           
             neo4j_ok = True
             print(f"✅ Neo4j graph updated! Cycles: {len(cycles)}")
         except Exception as neo4j_err:
             print(f"⚠️ Neo4j warning (non-fatal): {neo4j_err}")
 
-        # Node info fetch karo
+        
         node_info = get_node_info("node-1")
 
         return {
@@ -196,9 +184,7 @@ def simulate_deadlock():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# ─────────────────────────────────────────
-# 4. GET LOGS
-# ─────────────────────────────────────────
+
 @app.get("/api/v1/logs")
 def get_logs():
     try:
@@ -207,9 +193,6 @@ def get_logs():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# ─────────────────────────────────────────
-# 5. GET ALL TRANSACTIONS
-# ─────────────────────────────────────────
 @app.get("/api/v1/transactions")
 def get_transactions():
     try:
@@ -218,9 +201,7 @@ def get_transactions():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# ─────────────────────────────────────────
-# 6. GET WAITING LOCKS
-# ─────────────────────────────────────────
+
 @app.get("/api/v1/locks/waiting")
 def get_waiting():
     try:
@@ -229,9 +210,7 @@ def get_waiting():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# ─────────────────────────────────────────
-# 7. GET NODES
-# ─────────────────────────────────────────
+
 @app.get("/api/v1/nodes")
 def get_nodes():
     try:
@@ -241,9 +220,6 @@ def get_nodes():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# ─────────────────────────────────────────
-# 8. STATS — FIX 4: real resolved count
-# ─────────────────────────────────────────
 @app.get("/api/v1/stats")
 def get_stats():
     try:
@@ -268,16 +244,14 @@ def get_stats():
             "avg_resolution_ms": round(avg_ms, 2),
             "most_affected_resource": top_resource,
             "resolved_percentage": 100,
-            "resolved_count": total,      # FIX: sab resolved hain
+            "resolved_count": total,     
             "detected_count": total,
             "active_nodes": 3
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# ─────────────────────────────────────────
-# 9. GET LLM EXPLANATION BY EVENT ID
-# ─────────────────────────────────────────
+
 @app.get("/api/v1/explanation/{event_id}")
 def get_explanation(event_id: int):
     try:
@@ -293,9 +267,7 @@ def get_explanation(event_id: int):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# ─────────────────────────────────────────
-# 10. WAIT-FOR GRAPH (Neo4j)
-# ─────────────────────────────────────────
+
 @app.get("/api/v1/graph")
 def get_graph():
     try:
@@ -304,9 +276,7 @@ def get_graph():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# ─────────────────────────────────────────
-# 11. DETECT CYCLE (Neo4j)
-# ─────────────────────────────────────────
+
 @app.get("/api/v1/detect")
 def detect_cycle():
     try:
